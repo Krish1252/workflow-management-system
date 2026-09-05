@@ -101,214 +101,256 @@ function Dashboard() {
     (task) => task.status === "Completed"
   ).length;
 
+  const completionRate =
+    totalTasks === 0
+      ? 0
+      : Math.round((completedTasks / totalTasks) * 100);
+
   return (
     <div className="dashboard">
-      {/* Header */}
-      <div className="dashboard-header">
-        <div>
-          <div className="welcome-label">WORKSPACE</div>
-
-          <h1 className="dashboard-title">Dashboard</h1>
-
-          <p className="dashboard-subtitle">
-            Manage your tasks, track progress and stay organized.
-          </p>
+      <div className="dashboard-topbar">
+        <div className="topbar-search">
+          <span>Search</span>
+          <input
+            type="text"
+            placeholder="Search tasks..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
 
-        <button
-          className="create-button"
-          onClick={() => navigate("/create-task")}
-        >
-          <span>+</span>
-          Create Task
-        </button>
-      </div>
-
-      {/* Stats */}
-      <div className="stats">
-        <div className="stat-card">
-          <div className="stat-top">
-            <span className="stat-icon total-icon">✓</span>
-            <span className="stat-label">TOTAL TASKS</span>
-          </div>
-
-          <div className="stat-number">{totalTasks}</div>
-
-          <div className="stat-footer">
-            All tasks in your workspace
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-top">
-            <span className="stat-icon progress-icon">◷</span>
-            <span className="stat-label">IN PROGRESS</span>
-          </div>
-
-          <div className="stat-number">{inProgressTasks}</div>
-
-          <div className="stat-footer">
-            Currently being worked on
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-top">
-            <span className="stat-icon completed-icon">✓</span>
-            <span className="stat-label">COMPLETED</span>
-          </div>
-
-          <div className="stat-number">{completedTasks}</div>
-
-          <div className="stat-footer">
-            Successfully completed
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-top">
-            <span className="stat-icon pending-icon">!</span>
-            <span className="stat-label">PENDING</span>
-          </div>
-
-          <div className="stat-number">{pendingTasks}</div>
-
-          <div className="stat-footer">
-            Waiting to be completed
-          </div>
-        </div>
-      </div>
-
-      {/* Tasks section */}
-      <div className="tasks-container">
-        <div className="tasks-heading">
+        <div className="topbar-profile">
+          <div className="profile-avatar">K</div>
           <div>
-            <h2>My Tasks</h2>
-            <p>
-              {filteredTasks.length} task
-              {filteredTasks.length !== 1 ? "s" : ""} found
+            <strong>Krish</strong>
+            <span>Workspace</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="dashboard-content">
+        <div className="dashboard-header">
+          <div>
+            <div className="welcome-label">WORKSPACE</div>
+            <h1 className="dashboard-title">Good morning, Krish</h1>
+            <p className="dashboard-subtitle">
+              Here's what's happening with your tasks today.
             </p>
+          </div>
+
+          <button
+            className="create-button"
+            onClick={() => navigate("/create-task")}
+          >
+            <span>+</span>
+            New Task
+          </button>
+        </div>
+
+        <div className="stats">
+          <div className="stat-card primary-stat">
+            <div className="stat-top">
+              <span className="stat-label">TOTAL TASKS</span>
+              <span className="stat-mini-icon">T</span>
+            </div>
+            <div className="stat-number">{totalTasks}</div>
+            <div className="stat-footer">All tasks in your workspace</div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-top">
+              <span className="stat-label">IN PROGRESS</span>
+              <span className="stat-mini-icon">P</span>
+            </div>
+            <div className="stat-number">{inProgressTasks}</div>
+            <div className="stat-footer">Currently being worked on</div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-top">
+              <span className="stat-label">COMPLETED</span>
+              <span className="stat-mini-icon">C</span>
+            </div>
+            <div className="stat-number">{completedTasks}</div>
+            <div className="stat-footer">Successfully completed</div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-top">
+              <span className="stat-label">PENDING</span>
+              <span className="stat-mini-icon">P</span>
+            </div>
+            <div className="stat-number">{pendingTasks}</div>
+            <div className="stat-footer">Waiting to be completed</div>
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="filters">
-          <div className="search-box">
-            <span>⌕</span>
-
-            <input
-              type="text"
-              placeholder="Search tasks..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="All">All Status</option>
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-          </select>
-
-          <select
-            value={priorityFilter}
-            onChange={(e) => setPriorityFilter(e.target.value)}
-          >
-            <option value="All">All Priority</option>
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-          </select>
-        </div>
-
-        {/* Tasks */}
-        {loading ? (
-          <div className="empty-state">
-            <div className="loader"></div>
-            <p>Loading your tasks...</p>
-          </div>
-        ) : filteredTasks.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">✓</div>
-            <h3>No tasks found</h3>
-            <p>
-              Create a new task or change your search and filters.
-            </p>
-
-            <button
-              className="empty-button"
-              onClick={() => navigate("/create-task")}
-            >
-              Create your first task
-            </button>
-          </div>
-        ) : (
-          <div className="task-grid">
-            {filteredTasks.map((task) => (
-              <div className="task-card" key={task._id}>
-                <div className="task-card-header">
-                  <div className="task-title-area">
-                    <h3>{task.title}</h3>
-                  </div>
-
-                  <span
-                    className={`priority-badge ${task.priority
-                      ?.toLowerCase()
-                      .replace(" ", "-")}`}
-                  >
-                    {task.priority}
-                  </span>
-                </div>
-
-                <p className="task-description">
-                  {task.description || "No description provided."}
+        <div className="dashboard-grid">
+          <section className="tasks-panel">
+            <div className="panel-header">
+              <div>
+                <span className="panel-label">WORKSPACE</span>
+                <h2>My Tasks</h2>
+                <p>
+                  {filteredTasks.length} task
+                  {filteredTasks.length !== 1 ? "s" : ""} found
                 </p>
-
-                <div className="task-meta">
-                  <span
-                    className={`status-badge ${task.status
-                      ?.toLowerCase()
-                      .replace(" ", "-")}`}
-                  >
-                    <span className="status-dot"></span>
-                    {task.status}
-                  </span>
-
-                  <span className="due-date">
-                    Due{" "}
-                    {task.dueDate
-                      ? new Date(task.dueDate).toLocaleDateString()
-                      : "—"}
-                  </span>
-                </div>
-
-                <div className="task-divider"></div>
-
-                <div className="task-actions">
-                  <button
-                    className="edit-button"
-                    onClick={() =>
-                      navigate(`/edit-task/${task._id}`)
-                    }
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    className="delete-button"
-                    onClick={() => handleDelete(task._id)}
-                  >
-                    Delete
-                  </button>
-                </div>
               </div>
-            ))}
-          </div>
-        )}
+
+              <button
+                className="panel-create-button"
+                onClick={() => navigate("/create-task")}
+              >
+                + Add Task
+              </button>
+            </div>
+
+            <div className="filters">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <option value="All">All Status</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+
+              <select
+                value={priorityFilter}
+                onChange={(e) => setPriorityFilter(e.target.value)}
+              >
+                <option value="All">All Priority</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+
+            {loading ? (
+              <div className="empty-state">
+                <div className="loader"></div>
+                <p>Loading your tasks...</p>
+              </div>
+            ) : filteredTasks.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">+</div>
+                <h3>No tasks found</h3>
+                <p>
+                  Create a new task or change your search and filters.
+                </p>
+                <button
+                  className="empty-button"
+                  onClick={() => navigate("/create-task")}
+                >
+                  Create your first task
+                </button>
+              </div>
+            ) : (
+              <div className="task-list">
+                {filteredTasks.map((task) => (
+                  <div className="task-row" key={task._id}>
+                    <div className="task-main">
+                      <div className="task-check">
+                        {task.status === "Completed" ? "✓" : ""}
+                      </div>
+
+                      <div className="task-info">
+                        <h3>{task.title}</h3>
+                        <p>
+                          {task.description || "No description provided."}
+                        </p>
+
+                        <div className="task-details">
+                          <span
+                            className={`status-badge ${task.status
+                              ?.toLowerCase()
+                              .replace(" ", "-")}`}
+                          >
+                            <span className="status-dot"></span>
+                            {task.status}
+                          </span>
+
+                          <span className="due-date">
+                            Due{" "}
+                            {task.dueDate
+                              ? new Date(
+                                  task.dueDate
+                                ).toLocaleDateString()
+                              : "—"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="task-right">
+                      <span
+                        className={`priority-badge ${task.priority
+                          ?.toLowerCase()
+                          .replace(" ", "-")}`}
+                      >
+                        {task.priority}
+                      </span>
+
+                      <div className="task-actions">
+                        <button
+                          className="edit-button"
+                          onClick={() =>
+                            navigate(`/edit-task/${task._id}`)
+                          }
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          className="delete-button"
+                          onClick={() => handleDelete(task._id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <aside className="progress-panel">
+            <div className="panel-label">OVERVIEW</div>
+            <h2>Progress</h2>
+            <p className="progress-description">
+              Keep your workflow moving forward.
+            </p>
+
+            <div className="progress-circle">
+              <div>
+                <strong>{completionRate}%</strong>
+                <span>Complete</span>
+              </div>
+            </div>
+
+            <div className="progress-stats">
+              <div>
+                <span className="progress-dot completed"></span>
+                <span>Completed</span>
+                <strong>{completedTasks}</strong>
+              </div>
+
+              <div>
+                <span className="progress-dot active"></span>
+                <span>In Progress</span>
+                <strong>{inProgressTasks}</strong>
+              </div>
+
+              <div>
+                <span className="progress-dot pending"></span>
+                <span>Pending</span>
+                <strong>{pendingTasks}</strong>
+              </div>
+            </div>
+          </aside>
+        </div>
       </div>
     </div>
   );
