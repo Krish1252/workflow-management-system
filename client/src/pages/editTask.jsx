@@ -12,6 +12,10 @@ function EditTask() {
   const [priority, setPriority] = useState("Medium");
   const [dueDate, setDueDate] = useState("");
 
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [error, setError] = useState("");
+
   useEffect(() => {
     const fetchTask = async () => {
       try {
@@ -29,14 +33,18 @@ function EditTask() {
         const data = await response.json();
 
         if (response.ok) {
-          setTitle(data.title);
-          setDescription(data.description);
-          setStatus(data.status);
-          setPriority(data.priority);
-          setDueDate(data.dueDate?.split("T")[0]);
+          setTitle(data.title || "");
+          setDescription(data.description || "");
+          setStatus(data.status || "Pending");
+          setPriority(data.priority || "Medium");
+          setDueDate(data.dueDate?.split("T")[0] || "");
+        } else {
+          setError(data.message || "Unable to load task");
         }
       } catch (error) {
-        console.log(error);
+        setError("Unable to connect to server");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -46,7 +54,20 @@ function EditTask() {
   const handleUpdateTask = async (e) => {
     e.preventDefault();
 
+    if (!title.trim()) {
+      setError("Task title is required");
+      return;
+    }
+
+    if (!description.trim()) {
+      setError("Description is required");
+      return;
+    }
+
     try {
+      setUpdating(true);
+      setError("");
+
       const token = localStorage.getItem("token");
 
       const response = await fetch(
@@ -58,8 +79,8 @@ function EditTask() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            title,
-            description,
+            title: title.trim(),
+            description: description.trim(),
             status,
             priority,
             dueDate,
@@ -69,29 +90,43 @@ function EditTask() {
 
       const data = await response.json();
 
-      console.log(data);
-
       if (response.ok) {
         navigate("/dashboard");
+      } else {
+        setError(data.message || "Unable to update task");
       }
     } catch (error) {
-      console.log(error);
+      setError("Unable to connect to server");
+    } finally {
+      setUpdating(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="edit-page">
+        <div className="edit-loading">
+          <div className="edit-loader"></div>
+          <h3>Loading task</h3>
+          <p>Please wait while we load the task details.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="edit-page">
       <div className="edit-wrapper">
-
         <button
           className="back-button"
           onClick={() => navigate("/dashboard")}
         >
-          ← Back to Dashboard
+          <span>←</span>
+          Back to Dashboard
         </button>
 
         <div className="edit-header">
-          <div className="edit-icon">✎</div>
+          <div className="edit-icon">E</div>
 
           <div>
             <div className="edit-label">WORKSPACE</div>
@@ -104,100 +139,109 @@ function EditTask() {
           </div>
         </div>
 
-        <form
-          className="edit-form"
-          onSubmit={handleUpdateTask}
-        >
+        <form className="edit-form" onSubmit={handleUpdateTask}>
+          <div className="form-section">
+            <div className="section-heading">
+              <span>01</span>
 
-          <div className="form-group">
-            <label>Task Title</label>
-
-            <input
-              type="text"
-              placeholder="Task title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Description</label>
-
-            <textarea
-              placeholder="Task description"
-              value={description}
-              onChange={(e) =>
-                setDescription(e.target.value)
-              }
-              required
-            />
-          </div>
-
-          <div className="form-row">
-
-            <div className="form-group">
-              <label>Status</label>
-
-              <select
-                value={status}
-                onChange={(e) =>
-                  setStatus(e.target.value)
-                }
-              >
-                <option value="Pending">
-                  Pending
-                </option>
-
-                <option value="In Progress">
-                  In Progress
-                </option>
-
-                <option value="Completed">
-                  Completed
-                </option>
-              </select>
+              <div>
+                <h2>Task details</h2>
+                <p>Update the information about this task.</p>
+              </div>
             </div>
 
             <div className="form-group">
-              <label>Priority</label>
+              <label htmlFor="edit-title">Task Title</label>
 
-              <select
-                value={priority}
-                onChange={(e) =>
-                  setPriority(e.target.value)
-                }
-              >
-                <option value="Low">Low</option>
-
-                <option value="Medium">
-                  Medium
-                </option>
-
-                <option value="High">High</option>
-              </select>
+              <input
+                id="edit-title"
+                type="text"
+                placeholder="Task title"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  setError("");
+                }}
+              />
             </div>
 
+            <div className="form-group">
+              <label htmlFor="edit-description">Description</label>
+
+              <textarea
+                id="edit-description"
+                placeholder="Task description"
+                value={description}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  setError("");
+                }}
+              />
+            </div>
           </div>
 
-          <div className="form-group">
-            <label>Due Date</label>
+          <div className="form-divider"></div>
 
-            <input
-              type="date"
-              value={dueDate}
-              onChange={(e) =>
-                setDueDate(e.target.value)
-              }
-            />
+          <div className="form-section">
+            <div className="section-heading">
+              <span>02</span>
+
+              <div>
+                <h2>Task settings</h2>
+                <p>Adjust status, priority and deadline.</p>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="edit-status">Status</label>
+
+                <select
+                  id="edit-status"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="edit-priority">Priority</label>
+
+                <select
+                  id="edit-priority"
+                  value={priority}
+                  onChange={(e) => setPriority(e.target.value)}
+                >
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="edit-due-date">Due Date</label>
+
+              <input
+                id="edit-due-date"
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+              />
+            </div>
           </div>
+
+          {error && <div className="edit-error">{error}</div>}
 
           <div className="form-actions">
-
             <button
               type="button"
               className="cancel-button"
               onClick={() => navigate("/dashboard")}
+              disabled={updating}
             >
               Cancel
             </button>
@@ -205,14 +249,13 @@ function EditTask() {
             <button
               type="submit"
               className="update-button"
+              disabled={updating}
             >
-              ✓ Save Changes
+              {updating ? "Saving..." : "Save Changes"}
+              {!updating && <span>✓</span>}
             </button>
-
           </div>
-
         </form>
-
       </div>
     </div>
   );

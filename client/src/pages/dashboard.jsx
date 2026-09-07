@@ -74,9 +74,11 @@ function Dashboard() {
   }, []);
 
   const filteredTasks = tasks.filter((task) => {
+    const searchText = search.toLowerCase();
+
     const matchesSearch =
-      task.title?.toLowerCase().includes(search.toLowerCase()) ||
-      task.description?.toLowerCase().includes(search.toLowerCase());
+      task.title?.toLowerCase().includes(searchText) ||
+      task.description?.toLowerCase().includes(searchText);
 
     const matchesStatus =
       statusFilter === "All" || task.status === statusFilter;
@@ -106,33 +108,41 @@ function Dashboard() {
       ? 0
       : Math.round((completedTasks / totalTasks) * 100);
 
+  const progressDegrees = completionRate * 3.6;
+
   return (
     <div className="dashboard">
-      <div className="dashboard-topbar">
+      <header className="dashboard-topbar">
         <div className="topbar-search">
-          <span>Search</span>
+          <span className="search-icon">⌕</span>
+
           <input
             type="text"
             placeholder="Search tasks..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+
+          <span className="search-shortcut">/</span>
         </div>
 
         <div className="topbar-profile">
           <div className="profile-avatar">K</div>
-          <div>
+
+          <div className="profile-details">
             <strong>Krish</strong>
-            <span>Workspace</span>
+            <span>Workspace member</span>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="dashboard-content">
-        <div className="dashboard-header">
+      <main className="dashboard-content">
+        <section className="dashboard-header">
           <div>
-            <div className="welcome-label">WORKSPACE</div>
+            <div className="welcome-label">WORKSPACE OVERVIEW</div>
+
             <h1 className="dashboard-title">Good morning, Krish</h1>
+
             <p className="dashboard-subtitle">
               Here's what's happening with your tasks today.
             </p>
@@ -145,52 +155,78 @@ function Dashboard() {
             <span>+</span>
             New Task
           </button>
-        </div>
+        </section>
 
-        <div className="stats">
+        <section className="stats">
           <div className="stat-card primary-stat">
             <div className="stat-top">
-              <span className="stat-label">TOTAL TASKS</span>
-              <span className="stat-mini-icon">T</span>
+              <div>
+                <span className="stat-label">TOTAL TASKS</span>
+                <div className="stat-number">{totalTasks}</div>
+              </div>
+
+              <div className="stat-icon total-icon">T</div>
             </div>
-            <div className="stat-number">{totalTasks}</div>
-            <div className="stat-footer">All tasks in your workspace</div>
+
+            <div className="stat-footer">
+              All tasks in your workspace
+            </div>
           </div>
 
           <div className="stat-card">
             <div className="stat-top">
-              <span className="stat-label">IN PROGRESS</span>
-              <span className="stat-mini-icon">P</span>
+              <div>
+                <span className="stat-label">IN PROGRESS</span>
+                <div className="stat-number">{inProgressTasks}</div>
+              </div>
+
+              <div className="stat-icon progress-icon">P</div>
             </div>
-            <div className="stat-number">{inProgressTasks}</div>
-            <div className="stat-footer">Currently being worked on</div>
+
+            <div className="stat-footer">
+              Currently being worked on
+            </div>
           </div>
 
           <div className="stat-card">
             <div className="stat-top">
-              <span className="stat-label">COMPLETED</span>
-              <span className="stat-mini-icon">C</span>
+              <div>
+                <span className="stat-label">COMPLETED</span>
+                <div className="stat-number">{completedTasks}</div>
+              </div>
+
+              <div className="stat-icon completed-icon">C</div>
             </div>
-            <div className="stat-number">{completedTasks}</div>
-            <div className="stat-footer">Successfully completed</div>
+
+            <div className="stat-footer">
+              Successfully completed
+            </div>
           </div>
 
           <div className="stat-card">
             <div className="stat-top">
-              <span className="stat-label">PENDING</span>
-              <span className="stat-mini-icon">P</span>
-            </div>
-            <div className="stat-number">{pendingTasks}</div>
-            <div className="stat-footer">Waiting to be completed</div>
-          </div>
-        </div>
+              <div>
+                <span className="stat-label">PENDING</span>
+                <div className="stat-number">{pendingTasks}</div>
+              </div>
 
-        <div className="dashboard-grid">
-          <section className="tasks-panel">
+              <div className="stat-icon pending-icon">P</div>
+            </div>
+
+            <div className="stat-footer">
+              Waiting to be completed
+            </div>
+          </div>
+        </section>
+
+        <section className="dashboard-grid">
+          <div className="tasks-panel">
             <div className="panel-header">
               <div>
-                <span className="panel-label">WORKSPACE</span>
+                <div className="panel-label">WORKSPACE</div>
+
                 <h2>My Tasks</h2>
+
                 <p>
                   {filteredTasks.length} task
                   {filteredTasks.length !== 1 ? "s" : ""} found
@@ -201,7 +237,8 @@ function Dashboard() {
                 className="panel-create-button"
                 onClick={() => navigate("/create-task")}
               >
-                + Add Task
+                <span>+</span>
+                Add Task
               </button>
             </div>
 
@@ -230,15 +267,19 @@ function Dashboard() {
             {loading ? (
               <div className="empty-state">
                 <div className="loader"></div>
-                <p>Loading your tasks...</p>
+                <h3>Loading your tasks</h3>
+                <p>Please wait while we load your workspace.</p>
               </div>
             ) : filteredTasks.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-icon">+</div>
+
                 <h3>No tasks found</h3>
+
                 <p>
                   Create a new task or change your search and filters.
                 </p>
+
                 <button
                   className="empty-button"
                   onClick={() => navigate("/create-task")}
@@ -249,14 +290,19 @@ function Dashboard() {
             ) : (
               <div className="task-list">
                 {filteredTasks.map((task) => (
-                  <div className="task-row" key={task._id}>
+                  <article className="task-row" key={task._id}>
                     <div className="task-main">
-                      <div className="task-check">
+                      <div
+                        className={`task-check ${
+                          task.status === "Completed" ? "checked" : ""
+                        }`}
+                      >
                         {task.status === "Completed" ? "✓" : ""}
                       </div>
 
                       <div className="task-info">
                         <h3>{task.title}</h3>
+
                         <p>
                           {task.description || "No description provided."}
                         </p>
@@ -310,20 +356,27 @@ function Dashboard() {
                         </button>
                       </div>
                     </div>
-                  </div>
+                  </article>
                 ))}
               </div>
             )}
-          </section>
+          </div>
 
           <aside className="progress-panel">
             <div className="panel-label">OVERVIEW</div>
+
             <h2>Progress</h2>
+
             <p className="progress-description">
               Keep your workflow moving forward.
             </p>
 
-            <div className="progress-circle">
+            <div
+              className="progress-circle"
+              style={{
+                background: `conic-gradient(#7c3aed ${progressDegrees}deg, #ede9fe ${progressDegrees}deg)`,
+              }}
+            >
               <div>
                 <strong>{completionRate}%</strong>
                 <span>Complete</span>
@@ -350,8 +403,8 @@ function Dashboard() {
               </div>
             </div>
           </aside>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }
