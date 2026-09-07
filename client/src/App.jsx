@@ -4,7 +4,8 @@ import Login from "./pages/login";
 import Dashboard from "./pages/dashboard";
 import CreateTask from "./pages/createTask";
 import EditTask from "./pages/editTask";
-import Sidebar from "./components/Sidebar";
+import Sidebar from "./components/sidebar";
+import Register from "./pages/register";
 
 function App() {
   const location = useLocation();
@@ -29,6 +30,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/create-task" element={<CreateTask />} />
           <Route path="/edit-task/:id" element={<EditTask />} />
