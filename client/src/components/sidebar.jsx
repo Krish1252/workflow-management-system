@@ -1,16 +1,29 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import "./sidebar.css";
 
-function sidebar({ isOpen, onToggle }) {
+function Sidebar({ isOpen, onToggle }) {
   const navigate = useNavigate();
+
+  const storedUser = JSON.parse(
+    localStorage.getItem("user") || "null"
+  );
+
+  const userName = storedUser?.name || "User";
+  const userInitial = userName.charAt(0).toUpperCase();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/login");
+    localStorage.removeItem("user");
+
+    navigate("/login", { replace: true });
   };
 
   return (
-    <aside className={`sidebar ${isOpen ? "open" : "collapsed"}`}>
+    <aside
+      className={`sidebar ${
+        isOpen ? "open" : "collapsed"
+      }`}
+    >
       <div className="sidebar-header">
         <div className="sidebar-brand">
           <div className="sidebar-logo">W</div>
@@ -24,7 +37,9 @@ function sidebar({ isOpen, onToggle }) {
         <button
           className="sidebar-toggle"
           onClick={onToggle}
-          aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
+          aria-label={
+            isOpen ? "Close sidebar" : "Open sidebar"
+          }
         >
           <span></span>
           <span></span>
@@ -33,13 +48,17 @@ function sidebar({ isOpen, onToggle }) {
       </div>
 
       <div className="sidebar-section">
-        <span className="sidebar-section-title">Workspace</span>
+        <span className="sidebar-section-title">
+          Workspace
+        </span>
 
         <nav className="sidebar-nav">
           <NavLink
             to="/dashboard"
             className={({ isActive }) =>
-              isActive ? "sidebar-link active" : "sidebar-link"
+              isActive
+                ? "sidebar-link active"
+                : "sidebar-link"
             }
           >
             <span className="nav-symbol">D</span>
@@ -49,7 +68,9 @@ function sidebar({ isOpen, onToggle }) {
           <NavLink
             to="/create-task"
             className={({ isActive }) =>
-              isActive ? "sidebar-link active" : "sidebar-link"
+              isActive
+                ? "sidebar-link active"
+                : "sidebar-link"
             }
           >
             <span className="nav-symbol">+</span>
@@ -60,15 +81,20 @@ function sidebar({ isOpen, onToggle }) {
 
       <div className="sidebar-bottom">
         <div className="sidebar-user">
-          <div className="sidebar-avatar">K</div>
+          <div className="sidebar-avatar">
+            {userInitial}
+          </div>
 
           <div className="sidebar-user-info">
-            <strong>Krish</strong>
+            <strong>{userName}</strong>
             <span>Workspace member</span>
           </div>
         </div>
 
-        <button className="sidebar-logout" onClick={handleLogout}>
+        <button
+          className="sidebar-logout"
+          onClick={handleLogout}
+        >
           <span className="logout-symbol">L</span>
           <span className="logout-label">Logout</span>
         </button>
@@ -77,4 +103,4 @@ function sidebar({ isOpen, onToggle }) {
   );
 }
 
-export default sidebar;
+export default Sidebar;

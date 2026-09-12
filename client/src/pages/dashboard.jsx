@@ -11,9 +11,19 @@ function Dashboard() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [priorityFilter, setPriorityFilter] = useState("All");
 
+  const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+
+  const userName = storedUser?.name || "User";
+  const userInitial = userName.charAt(0).toUpperCase();
+
   const fetchTasks = async () => {
     try {
       const token = localStorage.getItem("token");
+
+      if (!token) {
+        navigate("/login", { replace: true });
+        return;
+      }
 
       const response = await fetch("http://localhost:5000/api/tasks", {
         headers: {
@@ -22,6 +32,13 @@ function Dashboard() {
       });
 
       const data = await response.json();
+
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/login", { replace: true });
+        return;
+      }
 
       if (response.ok) {
         setTasks(data.tasks || data);
@@ -56,6 +73,13 @@ function Dashboard() {
       );
 
       const data = await response.json();
+
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/login", { replace: true });
+        return;
+      }
 
       if (response.ok) {
         setTasks((currentTasks) =>
@@ -127,10 +151,10 @@ function Dashboard() {
         </div>
 
         <div className="topbar-profile">
-          <div className="profile-avatar">K</div>
+          <div className="profile-avatar">{userInitial}</div>
 
           <div className="profile-details">
-            <strong>Krish</strong>
+            <strong>{userName}</strong>
             <span>Workspace member</span>
           </div>
         </div>
@@ -141,7 +165,9 @@ function Dashboard() {
           <div>
             <div className="welcome-label">WORKSPACE OVERVIEW</div>
 
-            <h1 className="dashboard-title">Good morning, Krish</h1>
+            <h1 className="dashboard-title">
+              Good morning, {userName}
+            </h1>
 
             <p className="dashboard-subtitle">
               Here's what's happening with your tasks today.

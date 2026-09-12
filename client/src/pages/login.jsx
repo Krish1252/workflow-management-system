@@ -30,7 +30,9 @@ function Login() {
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
-        navigate("/dashboard");
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        navigate("/dashboard", { replace: true });
       } else {
         alert(data.message || "Login failed");
       }
@@ -43,7 +45,6 @@ function Login() {
   return (
     <div className="login-page">
       <div className="login-card">
-
         <div className="login-brand">
           <div className="login-logo">W</div>
           <span>Workflow</span>
@@ -55,7 +56,6 @@ function Login() {
         </div>
 
         <div className="login-form">
-
           <div className="login-field">
             <label>Email address</label>
 
@@ -87,7 +87,6 @@ function Login() {
           >
             Sign In
           </button>
-
         </div>
 
         <div className="login-footer">
@@ -97,7 +96,6 @@ function Login() {
             Create account
           </button>
         </div>
-
       </div>
     </div>
   );

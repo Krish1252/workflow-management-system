@@ -1,3 +1,6 @@
+const Task = require("../models/Task");
+
+
 const getProfile = async (req, res) => {
   res.status(200).json({
     message: "Protected Route Accessed Successfully",
@@ -5,9 +8,6 @@ const getProfile = async (req, res) => {
   });
 };
 
-
-
-const Task = require("../models/Task");
 
 const createTask = async (req, res) => {
   try {
